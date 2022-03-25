@@ -40,3 +40,7 @@ class Account(AbstractUser):
         if not self.id:
             self.type = self.base_type
         return super().save(*args, **kwargs)
+
+class Gender(models.TextChoices):
+    MALE = "MALE", "Male"
+    FEMALE = "FEMALE", "Female"
