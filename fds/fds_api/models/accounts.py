@@ -53,3 +53,19 @@ class PlayerAccountManager(models.Manager):
 class ScoutAccountManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs).filter(type=Account.Types.SCOUT)
+
+# class AdminAccountManager(models.Manager):
+    
+
+#     def create_superuser(self, **validated_data):
+
+#         validated_data['password'] = make_password(validated_data['password'])
+
+#         validated_data['is_staff'] = True
+#         validated_data['is_superuser'] = True
+#         validated_data['is_active'] = True
+#         # validated_data['phone_no'] = '0911'
+
+#         if validated_data['is_staff'] is not True:
+#             raise ValueError(
+#                 'Superuser must be assigned to is_staff=True.')
