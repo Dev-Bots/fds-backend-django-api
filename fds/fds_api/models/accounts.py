@@ -45,7 +45,7 @@ class Gender(models.TextChoices):
     MALE = "MALE", "Male"
     FEMALE = "FEMALE", "Female"
 
-# account managers for filtering the query set with the respective account types
+
 class PlayerAccountManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs).filter(type=Account.Types.PLAYER)
