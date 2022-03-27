@@ -77,3 +77,9 @@ class ScoutAccountManager(models.Manager):
 class ClubAccountManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs).filter(type=Account.Types.CLUB)
+
+############ Player specific account #################
+class PlayerMore(models.Model):
+
+    account = models.OneToOneField(Account, on_delete=models.CASCADE)
+
