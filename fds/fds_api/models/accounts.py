@@ -82,4 +82,47 @@ class ClubAccountManager(models.Manager):
 class PlayerMore(models.Model):
 
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
+    class Foot(models.TextChoices):
+        RIGHT = "RIGHT", "Right"
+        LEFT = "LEFT", "Left"
+        BOTH = "BOTH", "Both"
 
+    class PlayingPossition(models.TextChoices):
+        GK = "GK"
+
+        CB = "DEF/CB"
+        RB = "DEF/RB"
+        LB = "DEF/LB"
+
+        CM = "MID/CM"
+        LM = "MID/LM"
+        RM = "MID/RM"
+        CAM = "MID/CAM"
+        CDM = "MID/CDM"
+
+        CF = "STR/CF"
+        LW = "STR/LW"
+        RW = "STR/RW"
+
+    gender = models.CharField(
+        _("Gender"), max_length=50, choices=Gender.choices, blank=False
+    )
+    dob = models.DateField(_("Date of birth"), auto_now=False, auto_now_add=False, blank=False)
+
+    overview = models.TextField(_("Overview"), blank=True)
+    video = models.FileField(_("Video link"), blank=True, upload_to=VIDEO_PATH) 
+    birth_certificate = models.FileField(_("Birth certificate"), blank=False, upload_to=BIRTH_CERTIFICATE_PATH)
+    education_level =  models.CharField(_("Education level"), blank=False, max_length=255)
+    highest_education_evidence = models.FileField(_("Education evidence"), blank=False, upload_to=EDUCATION_CERTIFICATE_PATH)
+
+    foot = models.CharField(
+        _("Preffered foot"), max_length=50, choices=Foot.choices, default=Foot.RIGHT
+    )
+    weight = models.FloatField(_("Weight"), blank=False)
+    height = models.FloatField(_("Height"), blank=False)
+    playing_possition1 = models.CharField(
+        _("Playing possition 1"), max_length=50, choices=PlayingPossition.choices, blank=False
+    )
+    playing_possition2 = models.CharField(
+        _("Playing possition 2"), max_length=50, choices=PlayingPossition.choices, blank=False
+    )
