@@ -69,3 +69,11 @@ class ScoutAccountManager(models.Manager):
 #         if validated_data['is_staff'] is not True:
 #             raise ValueError(
 #                 'Superuser must be assigned to is_staff=True.')
+#         return Account.objects.create(**validated_data)
+        
+#     def get_queryset(self, *args, **kwargs):
+#         return super().get_queryset(*args, **kwargs).filter(type=Account.Types.ADMIN)
+
+class ClubAccountManager(models.Manager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(type=Account.Types.CLUB)
