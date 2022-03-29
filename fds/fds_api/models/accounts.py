@@ -126,3 +126,40 @@ class PlayerMore(models.Model):
     playing_possition2 = models.CharField(
         _("Playing possition 2"), max_length=50, choices=PlayingPossition.choices, blank=False
     )
+
+    
+class Player(Account):
+    base_type = Account.Types.PLAYER
+    objects = PlayerAccountManager()
+
+    @property
+    def more(self):
+        return self.playermore
+
+    class Meta:
+        proxy = True
+
+
+
+############ Club specific account #################
+class ClubMore(models.Model):
+    account = models.OneToOneField(Account, on_delete=models.CASCADE)
+
+    #the additional fields
+    club_name = models.TextField(_("Club name"), blank=True)
+    acronym =models.TextField(_("Acronym"), blank=True)
+    
+    organization_type =models.TextField(_("Organization type"), blank=True)
+    website = models.TextField(_("Website"), blank=True)
+    establishment_year = models.DateField(_("Establishment year"), blank=True, max_length=255)
+    
+class Club(Account):
+    base_type = Account.Types.CLUB
+    objects = ClubAccountManager()
+
+    @property
+    def more(self):
+        return self.clubmore
+
+    class Meta:
+        proxy = True
