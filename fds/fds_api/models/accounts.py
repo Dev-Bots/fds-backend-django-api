@@ -127,7 +127,7 @@ class PlayerMore(models.Model):
         _("Playing possition 2"), max_length=50, choices=PlayingPossition.choices, blank=False
     )
 
-    
+
 class Player(Account):
     base_type = Account.Types.PLAYER
     objects = PlayerAccountManager()
@@ -163,3 +163,38 @@ class Club(Account):
 
     class Meta:
         proxy = True
+
+############ Scout specific account #################
+class ScoutMore(models.Model):
+    id = models.IntegerField(primary_key=True, unique=True, auto_created=False)
+    account = models.OneToOneField(Account, on_delete=models.CASCADE)
+
+    #the additional fields
+    is_assigned = models.BooleanField(_("Is the Scout assigned"), default=False)
+
+    gender = models.CharField(
+        _("Gender"), max_length=50, choices=Gender.choices, blank=False
+    )
+    dob = models.DateField(_("Date of birth"), auto_now=False, auto_now_add=False, blank=False)
+    club = models.ForeignKey("Club", on_delete=models.CASCADE, related_name='scouts')
+
+     
+class Scout(Account):
+    base_type = Account.Types.SCOUT
+    objects = ScoutAccountManager()
+
+    @property
+    def more(self):
+        return self.scoutmore
+
+    class Meta:
+        proxy = True
+
+
+############ Adminspecific account #################    
+# class Admin(Account):
+#     base_type = Account.Types.ADMIN
+#     objects = AdminAccountManager()
+
+#     class Meta:
+#         proxy = True
