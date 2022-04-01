@@ -12,11 +12,22 @@ class Events(viewsets.ModelViewSet):
     
 class EventActions(viewsets.ViewSet):
 
-    #api/event_actions/event_id/apply   !!!!!!permission needed desperately!!!!!!!!!!!!!
+    #pk of event and request.data[player_ids]
     @action(methods=['post'], detail=True)
-    def apply(self, request, pk=None):
+    def approve_as_candidates(self, request, pk=None):
         event = get_object_or_404(Event, id=pk)
-        player = get_object_or_404(Player, id=request.user.id)
-        event.applicants.add(player)
-        event.save()
-        return Response({"Message": "Succesfully applied the event."}, status=status.HTTP_202_ACCEPTED)
+
+        to_be_candid_players = request.data['players']
+        if to_be_candid_players:
+            for player_id in to_be_candid_players:
+                player = Player.objects.filter(id=player_id).first()
+                if(player):
+                    if(player in event.applicants.all()):
+                        event.candidates.add(player)
+                        event.save()
+                    else:
+                        return Response({"Message": "Player not in the list of applicants for the event."}, status=status.HTTP_403_FORBIDDEN)    
+                else:
+                    continue
+            return Response({"Message": "Succesfully added players to the event."}, status=status.HTTP_202_ACCEPTED)
+        return Response({"Message": "Error, problem with the list of players provided."}, status=status.HTTP_406_NOT_ACCEPTABLE)
