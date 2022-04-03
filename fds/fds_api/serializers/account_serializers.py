@@ -22,3 +22,16 @@ class PlayerMoreSerializer(serializers.ModelSerializer):
             fields['gender'].read_only = True
             fields['birth_certificate'].read_only = True
         return fields
+
+class ClubSerializer(serializers.ModelSerializer):
+    more = ClubMoreSerializer()
+    
+    
+    class Meta:
+        fields = ['id', 'username', 'scouts', 'password', 'phone_number', 'address', 'type', 'more']
+        read_only_fields = ['id', 'type', 'scouts']
+
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+        model = Club
