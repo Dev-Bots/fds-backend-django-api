@@ -11,6 +11,14 @@ class Events(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     
 class EventActions(viewsets.ViewSet):
+    #api/event_actions/event_id/apply   !!!!!!permission needed desperately!!!!!!!!!!!!!
+    @action(methods=['post'], detail=True)
+    def apply(self, request, pk=None):
+        event = get_object_or_404(Event, id=pk)
+        player = get_object_or_404(Player, id=request.user.id)
+        event.applicants.add(player)
+        event.save()
+        return Response({"Message": "Succesfully applied the event."}, status=status.HTTP_202_ACCEPTED)
 
     #pk of event and request.data[player_ids]
     @action(methods=['post'], detail=True)
@@ -30,4 +38,24 @@ class EventActions(viewsets.ViewSet):
                 else:
                     continue
             return Response({"Message": "Succesfully added players to the event."}, status=status.HTTP_202_ACCEPTED)
+        return Response({"Message": "Error, problem with the list of players provided."}, status=status.HTTP_406_NOT_ACCEPTABLE)
+   
+     
+    #data list of players needed
+    @action(methods=['post'], detail=True)     
+    def accept_players(self, request, pk=None):
+        event = get_object_or_404(Event, id=pk)
+        to_be_accepted = request.data['players']
+        if to_be_accepted:
+            for player_id in to_be_accepted:
+                player = Player.objects.filter(id=player_id).first()
+                if(player):
+                    if(player in event.candidates.all()):
+                        event.accepted_applicants.add(player)
+                        event.save()
+                    else:
+                        return Response({"Message": "Player not in the list of candidates for the event."}, status=status.HTTP_403_FORBIDDEN)    
+                else:
+                    continue
+            return Response({"Message": "Succesfully accepted the winners of the event."}, status=status.HTTP_202_ACCEPTED)
         return Response({"Message": "Error, problem with the list of players provided."}, status=status.HTTP_406_NOT_ACCEPTABLE)
