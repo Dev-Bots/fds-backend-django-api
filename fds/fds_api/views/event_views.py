@@ -59,3 +59,59 @@ class EventActions(viewsets.ViewSet):
                     continue
             return Response({"Message": "Succesfully accepted the winners of the event."}, status=status.HTTP_202_ACCEPTED)
         return Response({"Message": "Error, problem with the list of players provided."}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+   # def get_permissions(self):
+    # """
+    # Instantiates and returns the list of permissions that this view requires.
+    # """
+    # if self.action == 'list':
+    #     permission_classes = [IsAuthenticated]
+    # else:
+    #     permission_classes = [IsAdminUser]
+    # return [permission() for permission in permission_classes]
+    
+
+    
+
+""" VIEWSET ACTIONS
+
+    def list(self, request):
+        pass
+
+    def create(self, request):
+        pass
+
+    def retrieve(self, request, pk=None):
+        pass
+
+    def update(self, request, pk=None):
+        pass
+
+    def partial_update(self, request, pk=None):
+        pass
+
+    def destroy(self, request, pk=None):
+        pass
+"""
+
+
+""" Concrete View Classes
+#CreateAPIView
+Used for create-only endpoints.
+#ListAPIView
+Used for read-only endpoints to represent a collection of model instances.
+#RetrieveAPIView
+Used for read-only endpoints to represent a single model instance.
+#DestroyAPIView
+Used for delete-only endpoints for a single model instance.
+#UpdateAPIView
+Used for update-only endpoints for a single model instance.
+##ListCreateAPIView
+Used for read-write endpoints to represent a collection of model instances.
+RetrieveUpdateAPIView
+Used for read or update endpoints to represent a single model instance.
+#RetrieveDestroyAPIView
+Used for read or delete endpoints to represent a single model instance.
+#RetrieveUpdateDestroyAPIView
+Used for read-write-delete endpoints to represent a single model instance.
+"""
