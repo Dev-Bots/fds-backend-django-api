@@ -25,4 +25,13 @@ class Skill(models.Model):
     weight_for_MID = models.IntegerField(_("Level of importance for MIDs"), choices=SkillWeight.choices, default=SkillWeight.MODERATE)
     weight_for_STR = models.IntegerField(_("Level of importance for GK"), choices=SkillWeight.choices, default=SkillWeight.MODERATE)
 
-    
+class Parameters(models.Model):
+    event = models.OneToOneField(Event, on_delete=models.CASCADE, related_name='parameters')
+    skills = models.ManyToManyField(Skill, related_name='parameter', blank=True)
+
+class Grade(models.Model):
+    event = models.ForeignKey('event', on_delete=models.CASCADE, related_name='event_grades')
+    scout = models.ForeignKey('scout', on_delete=models.DO_NOTHING, related_name='scouts_grade')
+    player = models.ForeignKey('player',on_delete=models.DO_NOTHING, related_name='graded_players')
+    score = models.JSONField(_("score"))
+    aggregate = models.FloatField(_("Aggregate"), blank=False)
