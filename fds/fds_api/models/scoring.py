@@ -37,27 +37,40 @@ class Grade(models.Model):
     aggregate = models.FloatField(_("Aggregate"), blank=False)
 
     def calculate_aggregate(self):
-    
-            weighted_sum = 0
-            for s in self.score:
-                skill = Skill.objects.filter(id = s).first()
-                
-                score = self.score[s]
-                
-                if 'GK' in self.player.more.playing_possition1:
-                    weighted_sum += skill.weight_for_GK * score
-                
-                elif 'DEF' in self.player.more.playing_possition1:
-                    weighted_sum += skill.weight_for_DEF * score
-                elif 'MID' in self.player.more.playing_possition1:
-                    weighted_sum += skill.weight_for_MID * score
-                    
-                elif 'STR' in self.player.more.playing_possition1:
-                    weighted_sum += skill.weight_for_STR * score
-                    
-
-            
-            aggregate = weighted_sum / len(self.score)
-
  
-            return aggregate
+        weighted_sum = 0
+        weights = []
+        for s in self.score:
+            skill = Skill.objects.filter(id = s).first()
+            
+            score = self.score[s]
+            
+
+            if 'GK' in self.player.more.playing_possition1:
+                weighted_sum += skill.weight_for_GK * score
+                weights.append(skill.weight_for_GK)
+
+            elif 'DEF' in self.player.more.playing_possition1:
+                weighted_sum += skill.weight_for_DEF * score
+                weights.append(skill.weight_for_DEF)
+
+            elif 'MID' in self.player.more.playing_possition1:
+                weighted_sum += skill.weight_for_MID * score
+                weights.append(skill.weight_for_MID)
+                
+
+            elif 'STR' in self.player.more.playing_possition1:
+                weighted_sum += skill.weight_for_STR * score
+                weights.append(skill.weight_for_STR)
+
+        
+        aggregate = weighted_sum / len(self.score)
+
+        # convert out of 10
+        maximum = 0
+        for weight in weights:
+            maximum += 10 * weight
+        maximum = maximum / len(self.score)
+        agg = 10*aggregate / maximum
+
+        return agg
