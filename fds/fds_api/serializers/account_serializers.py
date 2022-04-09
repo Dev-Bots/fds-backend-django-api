@@ -120,3 +120,72 @@ class ClubSerializer(serializers.ModelSerializer):
 
         return super().update(instance, validated_data)
 
+############# scout serializer ##################
+
+class ScoutMoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ['dob', 'gender', 'club', 'is_assigned']
+        read_only_fields = ['club']
+        model = ScoutMore
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request", None)
+        if request.method == 'PUT' or request.method == 'PATCH':
+            fields['dob'].read_only = True
+            fields['gender'].read_only = True
+        return fields
+
+
+class ScoutSerializer(serializers.ModelSerializer):
+    more = ScoutMoreSerializer()
+    
+    class Meta:
+        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'phone_number', 'address' , 'type', 'more']
+        read_only_fields = ['id', 'type']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+        model = Scout
+
+    def create(self, validated_data):
+        # keeping "more" before poping it to create the basic scout account
+        more = validated_data['more']
+        validated_data.pop('more')
+        club = self.context['request'].user
+        
+        #creating scout without more information
+        validated_data['password'] = make_password(validated_data['password'])
+        scout = Scout.objects.create(**validated_data)
+
+        
+        #adding "more property"
+        more['id'] = scout.id
+        more['account'] = scout
+        more['club'] = club
+        ScoutMore.objects.create(**more)
+
+        
+        
+        return scout
+
+    def update(self, instance, validated_data):
+        
+        if 'more' in validated_data.keys():
+            more = validated_data['more']
+            instance.more.__dict__.update(more)
+            instance.more.save()
+            validated_data.pop('more')
+
+        if 'password' in validated_data.keys():
+                validated_data['password'] = make_password(validated_data['password'])
+
+        return super().update(instance, validated_data)
+
+
+########### Admin serializer ###################
+# class AdminSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         fields = ['id', 'username', 'phone_number', 'address', 'type']
+#         read_only_fields = ['id', 'type']
+#         model = Admin
