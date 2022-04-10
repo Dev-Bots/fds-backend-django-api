@@ -12,9 +12,16 @@ class ParameterSerializer(serializers.ModelSerializer):
         model = Parameters
         fields = '__all__'
 
-
 class GradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
         fields = '__all__'
-        # read_only_fields = ['aggregate']
+
+
+    def create(self, validated_data):
+        # if Grade.objects.filter(event__id = validated_data['event'].id, player__id = validated_data['player'].id, scout__id = validated_data['scout'].id).first():
+        #     return False
+        grade = Grade.objects.create(**validated_data)
+        grade.aggregate = grade.calculate_aggregate()
+        grade.save()
+        return grade
