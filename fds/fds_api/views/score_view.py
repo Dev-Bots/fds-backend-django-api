@@ -37,3 +37,21 @@ class Results(viewsets.ViewSet):
             
         
         return Response(organized)
+
+        #retrieve the aggregate for a single player 
+    def retrieve(self, request, pk=None):
+        event_id = request.data['event_id']
+        queryset = Grade.objects.filter(player__id=pk, event__id=event_id)
+        serializer = GradeSerializer(queryset, many=True)
+
+        data = {}
+        data['id'] = pk
+        data['scores'] = serializer.data
+
+        scout_aggs = [grade.aggregate for grade in queryset]
+        average = sum(scout_aggs) / len(scout_aggs)
+
+        data['average'] = round(average, 2)
+        
+        
+        return Response(data)
