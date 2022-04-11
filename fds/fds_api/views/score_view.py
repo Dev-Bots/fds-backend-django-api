@@ -18,45 +18,22 @@ class GradeView(viewsets.ModelViewSet):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
 
-""" VIEWSET ACTIONS
+class Results(viewsets.ViewSet):
 
+    
     def list(self, request):
-        pass
+        event_id = request.data['event_id']
+        queryset = Grade.objects.filter(event__id=event_id).all()
+        player_ids = set([player.player.id for player in queryset])
+        organized = {}
 
-    def create(self, request):
-        pass
+        for p_id in player_ids:
+            query = Grade.objects.filter(event__id=event_id,player__id=p_id).all()
+            organized[p_id] = (GradeSerializer(query, many=True).data)
 
-    def retrieve(self, request, pk=None):
-        pass
-
-    def update(self, request, pk=None):
-        pass
-
-    def partial_update(self, request, pk=None):
-        pass
-
-    def destroy(self, request, pk=None):
-        pass
-"""
-
-
-""" Concrete View Classes
-#CreateAPIView
-Used for create-only endpoints.
-#ListAPIView
-Used for read-only endpoints to represent a collection of model instances.
-#RetrieveAPIView
-Used for read-only endpoints to represent a single model instance.
-#DestroyAPIView
-Used for delete-only endpoints for a single model instance.
-#UpdateAPIView
-Used for update-only endpoints for a single model instance.
-##ListCreateAPIView
-Used for read-write endpoints to represent a collection of model instances.
-RetrieveUpdateAPIView
-Used for read or update endpoints to represent a single model instance.
-#RetrieveDestroyAPIView
-Used for read or delete endpoints to represent a single model instance.
-#RetrieveUpdateDestroyAPIView
-Used for read-write-delete endpoints to represent a single model instance.
-"""
+            scout_aggs = [grade.aggregate for grade in queryset]
+            average = sum(scout_aggs) / len(scout_aggs)
+            organized['average'] = round(average)
+            
+        
+        return Response(organized)
