@@ -16,3 +16,10 @@ class Players(viewsets.ModelViewSet):
 class Clubs(viewsets.ModelViewSet):
     queryset = Club.objects.all()
     serializer_class = ClubSerializer
+
+
+class Scouts(viewsets.ModelViewSet):
+    queryset = Scout.objects.all()
+    serializer_class = ScoutSerializer   
+    permission_classes = [IsClubOrScoutEditRetrive]
+
