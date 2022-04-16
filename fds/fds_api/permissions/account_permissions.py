@@ -23,3 +23,19 @@ class IsClubOrScoutEditRetrive(permissions.BasePermission):
                     return False
             return True
         return obj.more.club == request.user
+
+class IsClub(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user.type == 'CLUB'
+
+class IsPlayer(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user.type == 'Player'
+
+class IsScout(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user.type == 'Scout'
+
+class FirstTimeApplication(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user not in obj.applicants.all()
