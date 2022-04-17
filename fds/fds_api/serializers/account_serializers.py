@@ -23,18 +23,19 @@ class PlayerMoreSerializer(serializers.ModelSerializer):
             fields['birth_certificate'].read_only = True
         return fields
 
-class ClubSerializer(serializers.ModelSerializer):
-    more = ClubMoreSerializer()
-    
+class PlayerSerializer(serializers.ModelSerializer):
+    more = PlayerMoreSerializer()
     
     class Meta:
-        fields = ['id', 'username', 'scouts', 'password', 'phone_number', 'address', 'type', 'more']
-        read_only_fields = ['id', 'type', 'scouts']
-
+        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'phone_number', 'address' , 'type', 'more']
+        read_only_fields = ['id', 'type']
+ 
         extra_kwargs = {
             'password': {'write_only': True}
         }
         model = Player
+
+
     def create(self, validated_data):
         # keeping "more" before poping it to create the basic player account
         more = validated_data['more']

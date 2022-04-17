@@ -125,7 +125,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# AUTH_USER_MODEL="fds_api.Account"
+AUTH_USER_MODEL="fds_api.Account"
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
