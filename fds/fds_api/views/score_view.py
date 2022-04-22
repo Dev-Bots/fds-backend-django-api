@@ -7,16 +7,32 @@ from ..serializers import SkillSerializer, ParameterSerializer, GradeSerializer
 
 
 class SkillView(viewsets.ModelViewSet):
-    queryset = Skill.objects.all()
+    
     serializer_class = SkillSerializer
+
+    def get_queryset(self):
+        queryset = Skill.objects.filter(club=self.request.user)
+        return queryset
+    
 
 class ParameterView(viewsets.ModelViewSet):
     queryset = Parameters.objects.all()
     serializer_class = ParameterSerializer
 
+    #this is for the depth of the nested returned json
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            self.serializer_class.Meta.depth = 1
+        else:
+            self.serializer_class.Meta.depth = 0
+        return self.serializer_class
+
+
+
 class GradeView(viewsets.ModelViewSet):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
+    
 
 class Results(viewsets.ViewSet):
 
@@ -38,7 +54,9 @@ class Results(viewsets.ViewSet):
         
         return Response(organized)
 
-        #retrieve the aggregate for a single player 
+
+
+    #retrieve the aggregate for a single player 
     def retrieve(self, request, pk=None):
         event_id = request.data['event_id']
         queryset = Grade.objects.filter(player__id=pk, event__id=event_id)
@@ -55,3 +73,47 @@ class Results(viewsets.ViewSet):
         
         
         return Response(data)
+
+""" VIEWSET ACTIONS
+
+    def list(self, request):
+        pass
+
+    def create(self, request):
+        pass
+
+    def retrieve(self, request, pk=None):
+        pass
+
+    def update(self, request, pk=None):
+        pass
+
+    def partial_update(self, request, pk=None):
+        pass
+
+    def destroy(self, request, pk=None):
+        pass
+"""
+
+
+""" Concrete View Classes
+#CreateAPIView
+Used for create-only endpoints.
+#ListAPIView
+Used for read-only endpoints to represent a collection of model instances.
+#RetrieveAPIView
+Used for read-only endpoints to represent a single model instance.
+#DestroyAPIView
+Used for delete-only endpoints for a single model instance.
+#UpdateAPIView
+Used for update-only endpoints for a single model instance.
+##ListCreateAPIView
+Used for read-write endpoints to represent a collection of model instances.
+RetrieveUpdateAPIView
+Used for read or update endpoints to represent a single model instance.
+#RetrieveDestroyAPIView
+Used for read or delete endpoints to represent a single model instance.
+#RetrieveUpdateDestroyAPIView
+Used for read-write-delete endpoints to represent a single model instance.
+"""
+
