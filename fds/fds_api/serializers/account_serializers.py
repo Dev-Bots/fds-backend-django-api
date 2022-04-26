@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 
+
 ############### Player serializers ##########################
 class PlayerMoreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,17 +18,21 @@ class PlayerMoreSerializer(serializers.ModelSerializer):
     def get_fields(self):
         fields = super().get_fields()
         request = self.context.get("request", None)
-        if request.method == 'PUT' or request.method == 'PATCH':
-            fields['dob'].read_only = True
-            fields['gender'].read_only = True
-            fields['birth_certificate'].read_only = True
+        if request is not None:
+            if request.method == 'PUT' or request.method == 'PATCH':
+                fields['dob'].read_only = True
+                fields['gender'].read_only = True
+                fields['birth_certificate'].read_only = True
         return fields
+
+
 
 class PlayerSerializer(serializers.ModelSerializer):
     more = PlayerMoreSerializer()
-    
+    old_password = serializers.CharField(required=False)
+
     class Meta:
-        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'phone_number', 'address' , 'type', 'more']
+        fields = ['id', 'username', "email", 'password', 'old_password','profile_picture', 'first_name', 'last_name', 'phone_number', 'address' , 'type', 'more']
         read_only_fields = ['id', 'type']
  
         extra_kwargs = {
@@ -35,11 +40,19 @@ class PlayerSerializer(serializers.ModelSerializer):
         }
         model = Player
 
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request", None)
+        if request is not None:
+            if request.method ==  'POST':
+                fields.pop('old_password')
+        return fields
 
     def create(self, validated_data):
         # keeping "more" before poping it to create the basic player account
         more = validated_data['more']
         validated_data.pop('more')
+    
 
         #creating player without more information
         validated_data['password'] = make_password(validated_data['password'])
@@ -58,10 +71,12 @@ class PlayerSerializer(serializers.ModelSerializer):
             instance.more.save()
             validated_data.pop('more')
 
-        if 'password' in validated_data.keys():
+        if 'password' in validated_data.keys() and 'old_password' in validated_data.keys():
+            if validated_data['old_password'] == instance.password:
                 validated_data['password'] = make_password(validated_data['password'])
 
         return super().update(instance, validated_data)
+
 
 ############# club serializer ##################
 
@@ -73,29 +88,41 @@ class ClubMoreSerializer(serializers.ModelSerializer):
     def get_fields(self):
         fields = super().get_fields()
         request = self.context.get("request", None)
-        if request.method == 'PUT' or request.method == 'PATCH':
-            fields['website'].read_only = True
+        if request is not None:
+            if request.method == 'PUT' or request.method == 'PATCH':
+                fields['website'].read_only = True
         return fields
 
 
 class ClubSerializer(serializers.ModelSerializer):
     more = ClubMoreSerializer()
-    
-    
-    class Meta:
-        fields = ['id', 'username', 'scouts', 'password', 'phone_number', 'address', 'type', 'more']
-        read_only_fields = ['id', 'type', 'scouts']
+    old_password = serializers.CharField(required=False)
 
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
+    class Meta:
+        fields = ['id', 'username', "email", 'scouts', 'old_password','profile_picture', 'phone_number', 'address', 'type', 'more']
+        read_only_fields = ['id', 'type', 'scouts']
+        
+
+        # extra_kwargs = {
+        #     'password': {'write_only': True},
+        # }
         model = Club
+        depth = 1
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request", None)
+        if request is not None:
+            if request.method ==  'POST':
+                fields.pop('old_password')
+        return fields
 
     def create(self, validated_data):
         
         # keeping "more" before poping it to create the basic club account
         more = validated_data['more']
         validated_data.pop('more')
+        
 
 
         #creating club without more information
@@ -115,44 +142,66 @@ class ClubSerializer(serializers.ModelSerializer):
             instance.more.__dict__.update(more)
             instance.more.save()
             validated_data.pop('more')
-
-        if 'password' in validated_data.keys():
+        
+       
+        if 'password' in validated_data.keys() and 'old_password' in validated_data.keys():
+            if validated_data['old_password'] == instance.password:
                 validated_data['password'] = make_password(validated_data['password'])
+
 
         return super().update(instance, validated_data)
 
 ############# scout serializer ##################
 
 class ScoutMoreSerializer(serializers.ModelSerializer):
+    # club = ClubSerializer()
     class Meta:
         fields = ['dob', 'gender', 'club', 'is_assigned']
         read_only_fields = ['club']
+
         model = ScoutMore
+        depth = 1
+        
+        
+        
+
 
     def get_fields(self):
         fields = super().get_fields()
         request = self.context.get("request", None)
-        if request.method == 'PUT' or request.method == 'PATCH':
-            fields['dob'].read_only = True
-            fields['gender'].read_only = True
+        if request is not None:
+            if request.method == 'PUT' or request.method == 'PATCH':
+                fields['dob'].read_only = True
+                fields['gender'].read_only = True
+            
         return fields
 
 
 class ScoutSerializer(serializers.ModelSerializer):
     more = ScoutMoreSerializer()
+    old_password = serializers.CharField(required=False)
     
     class Meta:
-        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'phone_number', 'address' , 'type', 'more']
+        fields = ['id', 'username', "email", 'password', 'old_password', 'profile_picture', 'first_name', 'last_name', 'phone_number', 'address' , 'type', 'more']
         read_only_fields = ['id', 'type']
         extra_kwargs = {
             'password': {'write_only': True}
         }
         model = Scout
+        
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request", None)
+        if request is not None:
+            if request.method ==  'POST':
+                fields.pop('old_password')
+        return fields
 
     def create(self, validated_data):
         # keeping "more" before poping it to create the basic scout account
         more = validated_data['more']
         validated_data.pop('more')
+      
         club = self.context['request'].user
         
         #creating scout without more information
@@ -178,10 +227,13 @@ class ScoutSerializer(serializers.ModelSerializer):
             instance.more.save()
             validated_data.pop('more')
 
-        if 'password' in validated_data.keys():
+        if 'password' in validated_data.keys() and 'old_password' in validated_data.keys():
+            if validated_data['old_password'] == instance.password:
                 validated_data['password'] = make_password(validated_data['password'])
 
         return super().update(instance, validated_data)
+
+    
 
 
 ########### Admin serializer ###################

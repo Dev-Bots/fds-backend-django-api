@@ -39,3 +39,4 @@ class IsScout(permissions.BasePermission):
 class FirstTimeApplication(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user not in obj.applicants.all()
+

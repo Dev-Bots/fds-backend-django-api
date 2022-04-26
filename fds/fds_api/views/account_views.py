@@ -5,23 +5,34 @@ from ..permissions import *
 from ..models import Player, Club, Scout
 from ..serializers import PlayerSerializer, ClubSerializer, ScoutSerializer
 
+
 # Create your views here.
 
 class Players(viewsets.ModelViewSet):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
-    permission_classes = [IsOwnerOrReadOnly]
+    # permission_classes = [IsOwnerOrReadOnly]
+    
     
    
 class Clubs(viewsets.ModelViewSet):
     queryset = Club.objects.all()
     serializer_class = ClubSerializer
-
+    
 
 class Scouts(viewsets.ModelViewSet):
     queryset = Scout.objects.all()
     serializer_class = ScoutSerializer   
-    permission_classes = [IsClubOrScoutEditRetrive]
+    #permission_classes = [IsClubOrScoutEditRetrive]
+
+    #this is for the depth of the nested returned json
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            self.serializer_class.Meta.depth = 1
+        else:
+            self.serializer_class.Meta.depth = 0
+        return self.serializer_class
+    
 
 """ VIEWSET ACTIONS
 
@@ -44,8 +55,8 @@ class Scouts(viewsets.ModelViewSet):
         pass
 """
 
-""" Concrete View Classes
 
+""" Concrete View Classes
 #CreateAPIView
 Used for create-only endpoints.
 #ListAPIView
@@ -65,3 +76,5 @@ Used for read or delete endpoints to represent a single model instance.
 #RetrieveUpdateDestroyAPIView
 Used for read-write-delete endpoints to represent a single model instance.
 """
+
+
