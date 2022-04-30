@@ -9,8 +9,18 @@ from ..serializers import EventSerializer
 class Events(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+
+    #this is for the depth of the nested returned json
+    # def get_serializer_class(self):
+    #     if self.request.method == "GET":
+    #         self.serializer_class.Meta.depth = 1
+    #     else:
+    #         self.serializer_class.Meta.depth = 0
+    #     return self.serializer_class
     
+
 class EventActions(viewsets.ViewSet):
+
     #api/event_actions/event_id/apply   !!!!!!permission needed desperately!!!!!!!!!!!!!
     @action(methods=['post'], detail=True)
     def apply(self, request, pk=None):
@@ -20,6 +30,7 @@ class EventActions(viewsets.ViewSet):
         event.save()
         return Response({"Message": "Succesfully applied the event."}, status=status.HTTP_202_ACCEPTED)
 
+    
     #pk of event and request.data[player_ids]
     @action(methods=['post'], detail=True)
     def approve_as_candidates(self, request, pk=None):
@@ -39,8 +50,7 @@ class EventActions(viewsets.ViewSet):
                     continue
             return Response({"Message": "Succesfully added players to the event."}, status=status.HTTP_202_ACCEPTED)
         return Response({"Message": "Error, problem with the list of players provided."}, status=status.HTTP_406_NOT_ACCEPTABLE)
-   
-     
+
     #data list of players needed
     @action(methods=['post'], detail=True)     
     def accept_players(self, request, pk=None):
@@ -60,7 +70,9 @@ class EventActions(viewsets.ViewSet):
             return Response({"Message": "Succesfully accepted the winners of the event."}, status=status.HTTP_202_ACCEPTED)
         return Response({"Message": "Error, problem with the list of players provided."}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-   # def get_permissions(self):
+
+
+    # def get_permissions(self):
     # """
     # Instantiates and returns the list of permissions that this view requires.
     # """
