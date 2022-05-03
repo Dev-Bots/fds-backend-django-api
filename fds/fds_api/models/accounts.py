@@ -5,10 +5,10 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.hashers import make_password
 
 # constants  !!!!!!!!! need to find a better place to put em
-PROFILE_PICTURE_PATH = 'assests/images/profile_pictures/'
-BIRTH_CERTIFICATE_PATH = 'assets/images/birth_certifcate/'
-EDUCATION_CERTIFICATE_PATH = 'assets/images/education/'
-VIDEO_PATH = 'assets/video/'
+PROFILE_PICTURE_PATH = 'images/profile_pictures/'
+BIRTH_CERTIFICATE_PATH = 'images/birth_certifcate/'
+EDUCATION_CERTIFICATE_PATH = 'images/education/'
+VIDEO_PATH = 'video/'
 
 class Account(AbstractUser):
     class Types(models.TextChoices):
@@ -45,14 +45,17 @@ class Gender(models.TextChoices):
     MALE = "MALE", "Male"
     FEMALE = "FEMALE", "Female"
 
+
 # account managers for filtering the query set with the respective account types
 class PlayerAccountManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs).filter(type=Account.Types.PLAYER)
 
+
 class ScoutAccountManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs).filter(type=Account.Types.SCOUT)
+
 
 # class AdminAccountManager(models.Manager):
     
@@ -69,6 +72,10 @@ class ScoutAccountManager(models.Manager):
 #         if validated_data['is_staff'] is not True:
 #             raise ValueError(
 #                 'Superuser must be assigned to is_staff=True.')
+#         if  validated_data['is_superuser'] is not True:
+#             raise ValueError(
+#                 'Superuser must be assigned to is_superuser=True.')
+
 #         return Account.objects.create(**validated_data)
         
 #     def get_queryset(self, *args, **kwargs):
@@ -78,10 +85,12 @@ class ClubAccountManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs).filter(type=Account.Types.CLUB)
 
+
 ############ Player specific account #################
 class PlayerMore(models.Model):
 
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
+
     class Foot(models.TextChoices):
         RIGHT = "RIGHT", "Right"
         LEFT = "LEFT", "Left"
@@ -89,20 +98,10 @@ class PlayerMore(models.Model):
 
     class PlayingPossition(models.TextChoices):
         GK = "GK"
-
-        CB = "DEF/CB"
-        RB = "DEF/RB"
-        LB = "DEF/LB"
-
-        CM = "MID/CM"
-        LM = "MID/LM"
-        RM = "MID/RM"
-        CAM = "MID/CAM"
-        CDM = "MID/CDM"
-
-        CF = "STR/CF"
-        LW = "STR/LW"
-        RW = "STR/RW"
+        DEF = "DEF"
+        MID = "MID"
+        STR = "STR"
+    
 
     gender = models.CharField(
         _("Gender"), max_length=50, choices=Gender.choices, blank=False
@@ -127,6 +126,7 @@ class PlayerMore(models.Model):
         _("Playing possition 2"), max_length=50, choices=PlayingPossition.choices, blank=False
     )
 
+    
 
 class Player(Account):
     base_type = Account.Types.PLAYER
@@ -189,6 +189,7 @@ class Scout(Account):
 
     class Meta:
         proxy = True
+
 
 
 ############ Adminspecific account #################    

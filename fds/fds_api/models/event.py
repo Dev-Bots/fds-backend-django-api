@@ -19,7 +19,8 @@ class Event(models.Model):
         ANY = "any"
         
 
-    club = models.OneToOneField("club", on_delete=models.CASCADE)
+    club = models.ForeignKey("club", on_delete=models.DO_NOTHING, related_name='events')
+    posted_date = models.DateField(auto_now=True)
     starting_date = models.DateField(_("Event start date"), auto_now=False, auto_now_add=False, blank=False)
     application_deadline = models.DateField(_("Application Deadline"), auto_now=False, auto_now_add=False, blank=False)
     description = models.TextField(_("Description"))
@@ -28,7 +29,7 @@ class Event(models.Model):
 
     age_limit = models.IntegerField(_("Age limit"), blank=False)
     education_level = models.CharField(_("Education level"), max_length=200)
-    location = models.CharField(_("Education level"),blank=False, max_length=200)
+    location = models.CharField(_("Location"),blank=False, max_length=200)
     gender = models.CharField(_("Gender"), max_length=50, choices=Gender.choices, blank=False)
     session_time_for_each = models.IntegerField(_("Session time"), blank=False)
     
@@ -36,6 +37,8 @@ class Event(models.Model):
     candidates = models.ManyToManyField(Player, related_name='candidates', blank=True)
     accepted_applicants = models.ManyToManyField(Player, related_name='accepted_applicants', blank=True)
 
-    scouts = models.ManyToManyField(Scout, related_name='assigned_scouts', blank=True)
+    scouts = models.ManyToManyField(Scout, related_name='assigned_eventd', blank=True)
 
     # parameters = models.OneToOneField('parameters', on_delete=models.CASCADE)
+
+

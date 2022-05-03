@@ -25,6 +25,9 @@ class Skill(models.Model):
     weight_for_MID = models.IntegerField(_("Level of importance for MIDs"), choices=SkillWeight.choices, default=SkillWeight.MODERATE)
     weight_for_STR = models.IntegerField(_("Level of importance for GK"), choices=SkillWeight.choices, default=SkillWeight.MODERATE)
 
+    is_default = models.BooleanField(_("Default skills"), default=False)
+    
+
 class Parameters(models.Model):
     event = models.OneToOneField(Event, on_delete=models.CASCADE, related_name='parameters')
     skills = models.ManyToManyField(Skill, related_name='parameter', blank=True)
